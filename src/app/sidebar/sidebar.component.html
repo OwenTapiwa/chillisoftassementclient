@@ -1,0 +1,47 @@
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-inner slimscroll">
+        <perfect-scrollbar [scrollIndicators]="false">
+            <div id="sidebar-menu" class="sidebar-menu">
+                <ul *ngIf="sidebarMenus.default">
+                    <li class="menu-title">
+                        <span>Main</span>
+                    </li>
+                    <li class="submenu" [ngClass]="{ 'active' : urlComplete.mainUrl === 'dashboard' }">
+                        <a href="javascript:" [ngClass]="{ 'subdrop' : urlComplete.mainUrl === 'dashboard' }">
+                            <i class="la la-dashboard"></i>
+                            <span>Dashboard</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul style="display: none;"
+                            [ngStyle]="{ 'display' : urlComplete.mainUrl === 'dashboard' ? 'block' : 'none' }">
+                            <li routerLink="/dashboard/admin"><a
+                                    [ngClass]="{ 'active' : urlComplete.subUrl === 'admin' }" href="javascript:">Admin
+                                    Dashboard</a></li>
+                        </ul>
+                    </li>
+                    
+                    <li class="submenu" [ngClass]="{ 'active' : urlComplete.mainUrl === 'projects' || urlComplete.subUrl === 'projectlist'|| urlComplete.subUrl === 'projectview' }">
+                        <a href="javascript:" [ngClass]="{ 'subdrop' : urlComplete.mainUrl === 'projects' || urlComplete.subUrl === 'projectlist'|| urlComplete.subUrl === 'projectview' }"href="javascript:"><i class="la la-rocket"></i> <span> Meetings</span> <span
+                                class="menu-arrow"></span></a>
+                        <ul style="display: none;"
+                        [ngStyle]="{ 'display' : urlComplete.mainUrl === 'projects' || urlComplete.subUrl === 'projectlist'|| urlComplete.subUrl === 'projectview' ? 'block' : 'none' }">
+                            <li routerLink="/projects/projectpage">
+                                <a href="javascript:"
+                                    [ngClass]="{'active' : urlComplete.subUrl === 'projectpage'|| urlComplete.subUrl === 'projectlist'|| urlComplete.subUrl === 'projectview'}">Meetings</a>
+                            </li>
+                            <li routerLink="/projects/tasks">
+                                <a href="javascript:" [ngClass]="{'active' : urlComplete.subUrl === 'tasks'}">Minutes</a>
+                            </li>
+                            <!-- <li routerLink="/projects/taskboard">
+                                <a href="javascript:" [ngClass]="{'active' : urlComplete.subUrl === 'taskboard'}">Task
+                                    Board</a>
+                            </li> -->
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </perfect-scrollbar>
+    </div>
+</div>
+<!-- /Sidebar -->

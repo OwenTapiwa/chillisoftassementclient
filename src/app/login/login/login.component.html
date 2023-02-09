@@ -1,0 +1,29 @@
+<div class="account-content">
+    <div class="container">
+        <!-- /Account Logo -->
+        <div class="account-box">
+            <div class="account-wrapper">
+                <h3 class="account-title">Login</h3>
+                <!-- Account Form -->
+                <form  (ngSubmit)="login()">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input class="form-control" [(ngModel)]="model.username" [ngModelOptions]="{standalone: true}" type="text">
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col">
+                                <label>Password</label>
+                            </div>
+                        </div>
+                        <input class="form-control"  [(ngModel)]="model.password" [ngModelOptions]="{standalone: true}" type="password">
+                    </div>
+                    <div class="form-group text-center">
+                        <button class="btn btn-primary account-btn"   type="submit">Login</button>
+                    </div>
+                </form>
+                <!-- /Account Form -->
+            </div>
+        </div>
+    </div>
+</div>
