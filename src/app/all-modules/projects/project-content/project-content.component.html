@@ -35,9 +35,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let meeting of meetings;let i = index">
+                        <tr *ngFor="let meeting of meetings$ |async;let i = index">
                             <td>
-                                <a routerLink="/projects/projectview/{{meeting.id}}">{{meeting.meetingId}}</a>
+                                <a routerLink="/projects/projectview/{{meeting.meetingId}}">{{meeting.meetingId}}</a>
                             </td>
                             <td>
                                 {{meeting.meetingType.name}}
@@ -104,12 +104,13 @@
                                     <option class="dropdown-item" disabled selected value="">Select Minutes Taker</option>
                                     <option *ngFor="let user of users" [value]="user.emailAddress">{{user.firstName + ' ' + user.lastName}} </option>
                                 </select>
-                                  <div
-                                  *ngIf="addMeetingForm.get('minutesTaker').invalid">
-                                  <small
-                                      *ngIf="addMeetingForm.get('minutesTaker') && isSubmit"
-                                      class="text-danger"> *required</small>
-                              </div>
+                                <div
+                                *ngIf="addMeetingForm.get('minutesTaker').invalid">
+                                <small
+                                    *ngIf="addMeetingForm.get('minutesTaker') && isSubmit"
+                                    class="text-danger"> *required
+                                </small>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -119,7 +120,7 @@
                                 <label>Date Held</label>
                                 <div class="cal-icon">
                                     <input class="form-control datetimepicker" type="text" bsDatepicker type="text"
-                                        [bsConfig]="{ dateInputFormat: 'DD-MM-YYYY',  returnFocusToInput: true }"
+                                        [minDate]="minDate" [maxDate] = "maxDate" [bsConfig]="{ dateInputFormat: 'DD-MM-YYYY',  returnFocusToInput: true }"
                                         [class.invalid]="addMeetingForm.get('dateHeld').invalid"
                                         formControlName="dateHeld">
                                 </div>

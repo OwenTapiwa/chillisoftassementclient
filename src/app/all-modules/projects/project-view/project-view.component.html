@@ -5,17 +5,14 @@
     <div class="page-header">
         <div class="row align-items-center">
             <div class="col">
-                <h3 class="page-title">{{projectTitle}}</h3>
+                <h3 class="page-title">{{meetingId}}</h3>
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item"><a routerLink="/dashboard">Dashboard</a></li>
-                    <li class="breadcrumb-item active">Project</li>
+                    <li class="breadcrumb-item active">Minutes</li>
                 </ul>
             </div>
             <div class="col-auto float-end ms-auto">
-                <a class="btn add-btn" data-bs-toggle="modal" data-bs-target="#edit_project"><i class="fa fa-plus"></i> Edit
-                    Project</a>
-                <a routerLink="/projects/taskboard" class="btn btn-white float-end m-r-10" data-bs-toggle="tooltip"
-                    title="Task Board"><i class="fa fa-bars"></i></a>
+                <a class="btn add-btn" data-bs-toggle="modal" data-bs-target="#add_item"><i class="fa fa-plus"></i> Add Item</a>
             </div>
         </div>
     </div>
@@ -26,10 +23,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="project-title">
-                        <h5 class="card-title">{{projectTitle}}</h5>
-                        <!-- <small class="block text-ellipsis m-b-15"><span class="text-xs">2</span> <span
-                                class="text-muted">open tasks, </span><span class="text-xs">5</span> <span
-                                class="text-muted">tasks completed</span></small> -->
+                        <h5 class="card-title">Meeting {{meetingId}}</h5>
                     </div>
                 </div>
             </div>
@@ -37,11 +31,11 @@
             <div class="project-task">
                 <ul class="nav nav-tabs nav-tabs-top nav-justified mb-0">
                     <li class="nav-item"><a class="nav-link active" href="#all_tasks" data-bs-toggle="tab"
-                            aria-expanded="true">All Tasks</a></li>
+                            aria-expanded="true">All Meeting Items</a></li>
                     <li class="nav-item"><a class="nav-link" href="#pending_tasks" data-bs-toggle="tab"
-                            aria-expanded="false">Pending Tasks</a></li>
+                            aria-expanded="false">Pending Meeting Items</a></li>
                     <li class="nav-item"><a class="nav-link" href="#completed_tasks" data-bs-toggle="tab"
-                            aria-expanded="false">Completed Tasks</a></li>
+                            aria-expanded="false">Completed Meeting Items</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane show active" id="all_tasks">
@@ -49,140 +43,100 @@
                             <div class="task-list-container">
                                 <div class="task-list-body">
                                     <ul id="task-list">
-                                        <li class="task">
-                                            <div class="task-container">
-                                                <span class="task-action-btn task-check">
-                                                    <span class="action-circle large complete-btn"
-                                                        title="Mark Complete">
-                                                        <i class="material-icons">check</i>
+                                        <li *ngFor="let meetingItem of meetingItems$ |async;let i = index">
+                                            <div [ngClass]="{
+                                                'task': meetingItem.meetingItemStatus.status !== 'Completed',
+                                                'completed task': meetingItem.meetingItemStatus.status === 'Completed'}">
+                                                <div class="task-container">
+                                                    <span class="task-action-btn task-check">
+                                                        <span *ngIf="meetingItem.meetingItemStatus.status == 'Open'" [ngClass]="meetingItem.meetingItemStatus.status !== 'Completed' ? 'action-circle large complete-btn' : 'action-circle large complete-btn'"
+                                                            title="Mark Complete">
+                                                            <a  [routerLink]="" (click)="markComplete(meetingItem.id)" ><i class="material-icons">check</i></a>
+                                                        </span>
                                                     </span>
-                                                </span>
-                                                <span class="task-label" contenteditable="true">Patient appointment
-                                                    booking</span>
-                                                <span class="task-action-btn task-btn-right">
-                                                    <span class="action-circle large" title="Assign">
-                                                        <i class="material-icons">person_add</i>
+                                                    <span class="task-label" contenteditable="false">{{meetingItem.action}}
                                                     </span>
-                                                    <span class="action-circle large delete-btn" title="Delete Task">
-                                                        <i class="material-icons">delete</i>
+                                                    <span class="task-action-btn task-btn-center">
+                                                            <div class="task-head-title text-success">Assigned To {{meetingItem.personResponsible.firstName + ' ' + meetingItem.personResponsible.lastName}} </div>
                                                     </span>
-                                                </span>
-                                            </div>
-                                        </li>
-                                        <li class="task">
-                                            <div class="task-container">
-                                                <span class="task-action-btn task-check">
-                                                    <span class="action-circle large complete-btn"
-                                                        title="Mark Complete">
-                                                        <i class="material-icons">check</i>
+                                                    <span class="task-action-btn task-btn-center">
+                                                        <div  class="task-head-title text-success">Due:{{meetingItem.dueDate | customDate}}</div>
+                                                        <div *ngIf="meetingItem.meetingItemStatus.status == 'Moved'" class="task-head-title text-success">Moved</div>
                                                     </span>
-                                                </span>
-                                                <span class="task-label" contenteditable="true">Appointment booking with
-                                                    payment gateway</span>
-                                                <span class="task-action-btn task-btn-right">
-                                                    <span class="action-circle large" title="Assign">
-                                                        <i class="material-icons">person_add</i>
-                                                    </span>
-                                                    <span class="action-circle large delete-btn" title="Delete Task">
-                                                        <i class="material-icons">delete</i>
-                                                    </span>
-                                                </span>
-                                            </div>
-                                        </li>
-                                        <li class="completed task">
-                                            <div class="task-container">
-                                                <span class="task-action-btn task-check">
-                                                    <span class="action-circle large complete-btn"
-                                                        title="Mark Complete">
-                                                        <i class="material-icons">check</i>
-                                                    </span>
-                                                </span>
-                                                <span class="task-label">Doctor available module</span>
-                                                <span class="task-action-btn task-btn-right">
-                                                    <span class="action-circle large" title="Assign">
-                                                        <i class="material-icons">person_add</i>
-                                                    </span>
-                                                    <span class="action-circle large delete-btn" title="Delete Task">
-                                                        <i class="material-icons">delete</i>
-                                                    </span>
-                                                </span>
-                                            </div>
-                                        </li>
-                                        <li class="task">
-                                            <div class="task-container">
-                                                <span class="task-action-btn task-check">
-                                                    <span class="action-circle large complete-btn"
-                                                        title="Mark Complete">
-                                                        <i class="material-icons">check</i>
-                                                    </span>
-                                                </span>
-                                                <span class="task-label" contenteditable="true">Patient and Doctor video
-                                                    conferencing</span>
-                                                <span class="task-action-btn task-btn-right">
-                                                    <span class="action-circle large" title="Assign">
-                                                        <i class="material-icons">person_add</i>
-                                                    </span>
-                                                    <span class="action-circle large delete-btn" title="Delete Task">
-                                                        <i class="material-icons">delete</i>
-                                                    </span>
-                                                </span>
-                                            </div>
-                                        </li>
-                                        <li class="task">
-                                            <div class="task-container">
-                                                <span class="task-action-btn task-check">
-                                                    <span class="action-circle large complete-btn"
-                                                        title="Mark Complete">
-                                                        <i class="material-icons">check</i>
-                                                    </span>
-                                                </span>
-                                                <span class="task-label" contenteditable="true">Private chat
-                                                    module</span>
-                                                <span class="task-action-btn task-btn-right">
-                                                    <span class="action-circle large" title="Assign">
-                                                        <i class="material-icons">person_add</i>
-                                                    </span>
-                                                    <span class="action-circle large delete-btn" title="Delete Task">
-                                                        <i class="material-icons">delete</i>
-                                                    </span>
-                                                </span>
-                                            </div>
-                                        </li>
-                                        <li class="task">
-                                            <div class="task-container">
-                                                <span class="task-action-btn task-check">
-                                                    <span class="action-circle large complete-btn"
-                                                        title="Mark Complete">
-                                                        <i class="material-icons">check</i>
-                                                    </span>
-                                                </span>
-                                                <span class="task-label" contenteditable="true">Patient Profile
-                                                    add</span>
-                                                <span class="task-action-btn task-btn-right">
-                                                    <span class="action-circle large" title="Assign">
-                                                        <i class="material-icons">person_add</i>
-                                                    </span>
-                                                    <span class="action-circle large delete-btn" title="Delete Task">
-                                                        <i class="material-icons">delete</i>
-                                                    </span>
-                                                </span>
+                                                     <span *ngIf="meetingItem.meetingItemStatus.status == 'Open'" class="action-circle large delete-btn" title="Edit Meeting Item">
+                                                        <a  [routerLink]="" (click)="openEditModal(meetingItem)" ><i class="material-icons">edit</i></a>
+                                                     </span>
+                                                </div>
                                             </div>
                                         </li>
                                     </ul>
                                 </div>
-                                <div class="task-list-footer">
-                                    <div class="new-task-wrapper">
-                                        <textarea id="new-task" placeholder="Enter new task here. . ."></textarea>
-                                        <span class="error-message hidden">You need to enter a task first</span>
-                                        <span class="add-new-task-btn btn" id="add-task">Add Task</span>
-                                        <span class="btn" id="close-task-panel">Close</span>
-                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="pending_tasks">
+                        <div class="task-wrapper">
+                            <div class="task-list-container">
+                                <div class="task-list-body">
+                                    <ul id="task-list">
+                                        <li *ngFor="let meetingItem of meetingItems;let i = index">
+                                            <div *ngIf="meetingItem.meetingItemStatus.status != 'Complete'" class="task">
+                                                <div class="task-container">
+                                                    <span class="task-action-btn task-check">
+                                                        <span *ngIf="meetingItem.meetingItemStatus.status == 'Open'" [ngClass]="meetingItem.meetingItemStatus.status !== 'Completed' ? 'action-circle large complete-btn' : 'action-circle large complete-btn'"
+                                                            title="Mark Complete">
+                                                            <a  [routerLink]="" (click)="markComplete(meetingItem.id)" ><i class="material-icons">check</i></a>
+                                                        </span>
+                                                    </span>
+                                                    <span class="task-label" contenteditable="false">{{meetingItem.action}}
+                                                    </span>
+                                                    <span class="task-action-btn task-btn-center">
+                                                            <div class="task-head-title text-success">Assigned To {{meetingItem.personResponsible.firstName + ' ' + meetingItem.personResponsible.lastName}} </div>
+                                                    </span>
+                                                    <span class="task-action-btn task-btn-center">
+                                                        <div class="task-head-title text-success">Due:{{meetingItem.dueDate | customDate}}</div>
+                                                        <div *ngIf="meetingItem.meetingItemStatus.status == 'Moved'" class="task-head-title text-success">Moved</div>
+                                                    </span>
+                                                    <span class="task-action-btn task-btn-right">
+                                                        <span class="action-circle large delete-btn" title="Edit Meeting Item">
+                                                            <i class="material-icons">edit</i>
+                                                        </span>
+                                                    </span>
+                                                    <span *ngIf="meetingItem.meetingItemStatus.status == 'Open'" class="action-circle large delete-btn" title="Edit Meeting Item">
+                                                        <a  [routerLink]="" (click)="openEditModal(meetingItem)" ><i class="material-icons">edit</i></a>
+                                                     </span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="completed_tasks">
+                        <div class="task-wrapper">
+                            <div class="task-list-container">
+                                <div class="task-list-body">
+                                    <ul id="task-list">
+                                        <li *ngFor="let meetingItem of meetingItems;let i = index">
+                                            <div *ngIf="meetingItem.meetingItemStatus.status == 'Completed'" class="task">
+                                                <div class="task-container">
+                                                    <span class="task-label" contenteditable="false">{{meetingItem.action}}
+                                                    </span>
+                                                    <span class="task-action-btn task-btn-center">
+                                                            <div class="task-head-title text-success">Assigned To {{meetingItem.personResponsible.firstName + ' ' + meetingItem.personResponsible.lastName}} </div>
+                                                    </span>
+                                                    <span class="task-action-btn task-btn-center">
+                                                        <div class="task-head-title text-success">Completed:{{meetingItem.meetingItemStatus.addedDate | customDate}}</div>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane" id="pending_tasks"></div>
-                    <div class="tab-pane" id="completed_tasks"></div>
                 </div>
             </div>
         </div>
@@ -190,266 +144,142 @@
 </div>
 <!-- /Page Content -->
 
-<!-- Assign Leader Modal -->
-<div id="assign_leader" class="modal custom-modal fade" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Assign Leader to this project</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="input-group m-b-30">
-                    <input placeholder="Search to add a leader" class="form-control search-input" type="text">
-                    <button class="btn btn-primary">Search</button>
-                </div>
-                <div>
-                    <ul class="chat-user-list">
-                        <li>
-                            <a>
-                                <div class="media d-flex">
-                                    <span class="avatar flex-shrink-0"><img alt="" src="assets/img/profiles/avatar-9.jpg"></span>
-                                    <div class="media-body align-self-center text-nowrap flex-grow-1">
-                                        <div class="user-name">Richard Miles</div>
-                                        <span class="designation">Web Developer</span>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                        <li>
-                            <a>
-                                <div class="media d-flex">
-                                    <span class="avatar flex-shrink-0"><img alt="" src="assets/img/profiles/avatar-10.jpg"></span>
-                                    <div class="media-body align-self-center text-nowrap flex-grow-1">
-                                        <div class="user-name">John Smith</div>
-                                        <span class="designation">Android Developer</span>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                        <li>
-                            <a>
-                                <div class="media d-flex">
-                                    <span class="avatar flex-shrink-0">
-                                        <img alt="" src="assets/img/profiles/avatar-16.jpg">
-                                    </span>
-                                    <div class="media-body align-self-center text-nowrap flex-grow-1">
-                                        <div class="user-name">Jeffery Lalor</div>
-                                        <span class="designation">Team Leader</span>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="submit-section">
-                    <button class="btn btn-primary submit-btn">Submit</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- /Assign Leader Modal -->
-
-<!-- Assign User Modal -->
-<div id="assign_user" class="modal custom-modal fade" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Assign the user to this project</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="input-group m-b-30">
-                    <input placeholder="Search a user to assign" class="form-control search-input" type="text">
-                    <button class="btn btn-primary">Search</button>
-                </div>
-                <div>
-                    <ul class="chat-user-list">
-                        <li>
-                            <a>
-                                <div class="media d-flex">
-                                    <span class="avatar flex-shrink-0"><img alt="" src="assets/img/profiles/avatar-9.jpg"></span>
-                                    <div class="media-body align-self-center text-nowrap flex-grow-1">
-                                        <div class="user-name">Richard Miles</div>
-                                        <span class="designation">Web Developer</span>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                        <li>
-                            <a>
-                                <div class="media d-flex">
-                                    <span class="avatar flex-shrink-0"><img alt="" src="assets/img/profiles/avatar-10.jpg"></span>
-                                    <div class="media-body align-self-center text-nowrap flex-grow-1">
-                                        <div class="user-name">John Smith</div>
-                                        <span class="designation">Android Developer</span>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                        <li>
-                            <a>
-                                <div class="media d-flex">
-                                    <span class="avatar flex-shrink-0">
-                                        <img alt="" src="assets/img/profiles/avatar-16.jpg">
-                                    </span>
-                                    <div class="media-body align-self-center text-nowrap flex-grow-1">
-                                        <div class="user-name">Jeffery Lalor</div>
-                                        <span class="designation">Team Leader</span>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="submit-section">
-                    <button class="btn btn-primary submit-btn">Submit</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- /Assign User Modal -->
-
-<!-- Edit Project Modal -->
-<div id="edit_project" class="modal custom-modal fade" role="dialog">
+<!-- Add Meeting Item  Modal -->
+<div id="add_item" class="modal custom-modal fade" role="dialog" >
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Edit Project</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                <h5 class="modal-title">Add Item</h5>
+                <button id="ModalClose" type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form>
+                <form [formGroup]="addMeetingItemForm">
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-sm-7">
                             <div class="form-group">
-                                <label>Project Name</label>
-                                <input class="form-control" value="Project Management" type="text">
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label>Client</label>
-                                <select class="form-select form-control">
-                                    <option>Global Technologies</option>
-                                    <option>Delta Infotech</option>
+                                <label>Person Responsible</label>
+                                <select class="form-select form-control" formControlName="personResponsible">
+                                    <option class="dropdown-item" disabled selected value="">Select Person Responsible</option>
+                                    <option *ngFor="let user of users" [value]="user.emailAddress">{{user.firstName + ' ' + user.lastName}} </option>
                                 </select>
+                                <div
+                                *ngIf="addMeetingItemForm.get('personResponsible').invalid">
+                                <small
+                                    *ngIf="addMeetingItemForm.get('personResponsible') && isSubmit"
+                                    class="text-danger"> *required
+                                </small>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-sm-5">
                             <div class="form-group">
-                                <label>Start Date</label>
+                                <label>Due Date</label>
                                 <div class="cal-icon">
-                                    <input class="form-control datetimepicker" type="text">
+                                    <input formControlName="dueDate" class="form-control datetimepicker" type="text" bsDatepicker type="text"
+                                        [minDate]="minDate" [maxDate] = "maxDate" [bsConfig]="{ dateInputFormat: 'DD-MM-YYYY',  returnFocusToInput: true }"
+                                        [class.invalid]="addMeetingItemForm.get('dueDate').invalid">
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label>End Date</label>
-                                <div class="cal-icon">
-                                    <input class="form-control datetimepicker" type="text">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label>Rate</label>
-                                <input placeholder="$50" class="form-control" value="$5000" type="text">
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label>&nbsp;</label>
-                                <select class="form-select form-control">
-                                    <option>Hourly</option>
-                                    <option selected>Fixed</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label>Priority</label>
-                                <select class="form-select form-control">
-                                    <option selected>High</option>
-                                    <option>Medium</option>
-                                    <option>Low</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label>Add Project Leader</label>
-                                <input class="form-control" type="text">
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label>Team Leader</label>
-                                <div class="project-members">
-                                    <a class="avatar" data-bs-toggle="tooltip" title="Jeffery Lalor">
-                                        <img alt="" src="assets/img/profiles/avatar-16.jpg">
-                                    </a>
+                                <div
+                                    *ngIf="addMeetingItemForm.get('dueDate').invalid">
+                                    <small
+                                        *ngIf="addMeetingItemForm.get('dueDate') && isSubmit"
+                                        class="text-danger"> *Date is required</small>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-sm-12">
                             <div class="form-group">
-                                <label>Add Team</label>
-                                <input class="form-control" type="text">
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label>Team Members</label>
-                                <div class="project-members">
-                                    <a class="avatar" data-bs-toggle="tooltip" title="John Doe">
-                                        <img alt="" src="assets/img/profiles/avatar-2.jpg">
-                                    </a>
-                                    <a class="avatar" data-bs-toggle="tooltip" title="Richard Miles">
-                                        <img alt="" src="assets/img/profiles/avatar-9.jpg">
-                                    </a>
-                                    <a class="avatar" data-bs-toggle="tooltip" title="John Smith">
-                                        <img alt="" src="assets/img/profiles/avatar-10.jpg">
-                                    </a>
-                                    <a class="avatar" data-bs-toggle="tooltip" title="Mike Litorus">
-                                        <img alt="" src="assets/img/profiles/avatar-5.jpg">
-                                    </a>
-                                    <span class="all-team">+2</span>
+                                <label>Action</label>
+                                <textarea rows="4" class="form-control" formControlName="action" placeholder="Enter your meeting Item here"></textarea>
+                                <div *ngIf="addMeetingItemForm.get('action').invalid">
+                                    <small
+                                        *ngIf="addMeetingItemForm.get('action') && isSubmit"
+                                        class="text-danger"> *required</small>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label>Description</label>
-                        <textarea rows="4" class="form-control" placeholder="Enter your message here"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Upload Files</label>
-                        <input class="form-control" type="file">
-                    </div>
+                   
                     <div class="submit-section">
-                        <button class="btn btn-primary submit-btn">Save</button>
+                        <button class="btn btn-primary submit-btn" (click)="addMeetingItem()">Save</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
-<!-- /Edit Project Modal -->
+<!-- /Add Meeting Item Modal -->
+<!-- Add Meeting Item  Modal -->
+<div id="edit_item" class="modal custom-modal fade" role="dialog" >
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Item</h5>
+                <button id="ModalEditClose" type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="editMeetingItemForm">
+                    <div class="row">
+                        <div class="col-sm-7">
+                            <div class="form-group">
+                                <label>Person Responsible</label>
+                                <select class="form-select form-control" formControlName="personResponsible">
+                                    <option class="dropdown-item" disabled selected value="">Select Person Responsible</option>
+                                    <option *ngFor="let user of users" [value]="user.emailAddress">{{user.firstName + ' ' + user.lastName}} </option>
+                                </select>
+                                <div
+                                *ngIf="editMeetingItemForm.get('personResponsible').invalid">
+                                <small
+                                    *ngIf="editMeetingItemForm.get('personResponsible') && isSubmit"
+                                    class="text-danger"> *required
+                                </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5">
+                            <div class="form-group">
+                                <label>Due Date</label>
+                                <div class="cal-icon">
+                                    <input formControlName="dueDate" class="form-control datetimepicker" type="text" bsDatepicker type="text"
+                                        [minDate]="minDate" [maxDate] = "maxDate" [bsConfig]="{ dateInputFormat: 'DD-MM-YYYY',  returnFocusToInput: true }"
+                                        [class.invalid]="addMeetingItemForm.get('dueDate').invalid">
+                                </div>
+                                <div
+                                    *ngIf="editMeetingItemForm.get('dueDate').invalid">
+                                    <small
+                                        *ngIf="editMeetingItemForm.get('dueDate') && isSubmit"
+                                        class="text-danger"> *Date is required</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label>Action</label>
+                                <textarea rows="4" class="form-control" formControlName="action" placeholder="Enter your meeting Item here"></textarea>
+                                <div *ngIf="editMeetingItemForm.get('action').invalid">
+                                    <small
+                                        *ngIf="editMeetingItemForm.get('action') && isSubmit"
+                                        class="text-danger"> *required</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <div class="submit-section">
+                        <button class="btn btn-primary submit-btn" (click)="editMeetingItem()">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Edit Meeting Item Modal -->
+

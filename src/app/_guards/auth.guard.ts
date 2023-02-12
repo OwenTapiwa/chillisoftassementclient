@@ -14,7 +14,6 @@ import { User } from 'src/app/_models/user'
 export class AuthGuard implements CanActivate {
   constructor(private accountService: AccountService,private router:Router,private toastr: ToastrService){}
   canActivate(): boolean{
-      debugger;
       var loggedIn = this.accountService.IsLoggedIn();
       if(loggedIn){
         return true;

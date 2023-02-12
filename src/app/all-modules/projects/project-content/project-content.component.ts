@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, NgForm } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
 import { Observable, Subject } from "rxjs";
@@ -7,7 +7,7 @@ import { DataTableDirective } from "angular-datatables";
 import { MeetingService } from "src/app/_services/meeting.service";
 import { UserService } from "src/app/_services/user.service";
 import { SysUsers } from "src/app/_models/sysUsers";
-import { MeetingType } from "src/app/_models/meeting";
+import { Meeting, MeetingType } from "src/app/_models/meeting";
 
 declare const $: any;
 @Component({
@@ -18,15 +18,27 @@ declare const $: any;
 export class ProjectContentComponent implements OnInit, OnDestroy {
   @ViewChild(DataTableDirective, { static: false })
   public dtElement: DataTableDirective;
-  public dtOptions: DataTables.Settings = {};
+  public dtOptions: DataTables.Settings = {
+      pagingType: 'full_numbers',
+      pageLength: 10,
+      scrollX: true,
+      processing: true,
+      deferRender: true,
+      destroy:true
+  };
   public meetings = [];
   meetingTypes: MeetingType[] | undefined;
   users:SysUsers[] | undefined;
   isSubmit: boolean = false;
+  meetings$: Observable<Meeting[]> | undefined;
+  minDate: Date;
+  maxDate: Date;
+  
 
-  public addMeetingForm: FormGroup;
-  public editMeetingForm: FormGroup;
-  public tempId: any;
+
+  addMeetingForm: FormGroup;
+  private editMeetingForm: FormGroup;
+ 
 
   public rows = [];
   public srch = [];
@@ -50,8 +62,7 @@ export class ProjectContentComponent implements OnInit, OnDestroy {
     $(document).ready(function () {
       $('[data-bs-toggle="tooltip"]').tooltip();
     });
-    debugger;
-    this.getMeetings();
+    this.meetings$ = this.meetingService.getMeetings();
     this.getMeetingTypes();
     this.getUsers();
     
@@ -70,6 +81,11 @@ export class ProjectContentComponent implements OnInit, OnDestroy {
       minutesTaker: ["", [Validators.required]],
       meetingId: [""],
     });
+
+    this.minDate = new Date();
+    this.maxDate = new Date();
+    this.minDate.setDate(this.minDate.getDate() - 30);
+    this.maxDate.setDate(this.maxDate.getDate());
   }
 
 
@@ -114,17 +130,17 @@ export class ProjectContentComponent implements OnInit, OnDestroy {
       return;
     }
     this.meetingService.addMeeting(newMeeting).subscribe();
-     $("#datatable").DataTable().clear();
-      this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
-        dtInstance.destroy();
-      });
-      this.dtTrigger.next();
-    this.getMeetings();
-    this.getMeetingTypes();
-    this.getUsers();
+   
+    this.dtTrigger.next();
+    this.ngOnInit();
     this.addMeetingForm.reset();
     this.addMeetingForm.value.meetingtype = '';
     this.isSubmit = false;
+    //  $("#datatable").DataTable().clear();
+     console.log(this.dtElement);
+     this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+       dtInstance.destroy();
+     });
     $("#create_project").modal("hide");
     this.toastr.success("Meeting added sucessfully...!", "Success");
   }
@@ -156,4 +172,6 @@ export class ProjectContentComponent implements OnInit, OnDestroy {
     // Do not forget to unsubscribe the event
     this.dtTrigger.unsubscribe();
   }
+
+  
 }
