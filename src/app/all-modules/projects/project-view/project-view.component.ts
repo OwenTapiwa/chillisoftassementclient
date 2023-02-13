@@ -1,5 +1,5 @@
 import { DatePipe } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
@@ -10,7 +10,8 @@ import { MeetingItemService } from "src/app/_services/meetingItem.service";
 import { UserService } from "src/app/_services/user.service";
 import { Modal } from 'bootstrap';
 import { Observable } from "rxjs";
-import { moment } from "ngx-bootstrap/chronos/test/chain";
+import Swal from 'sweetalert2/dist/sweetalert2.js';
+
 
 @Component({
   selector: "app-project-view",
@@ -30,8 +31,6 @@ export class ProjectViewComponent implements OnInit {
   meetingItemId: string = "";
   minDate: Date;
   maxDate: Date;
-  
-
 
 
   constructor(
@@ -39,7 +38,8 @@ export class ProjectViewComponent implements OnInit {
     private meetingItemService:MeetingItemService,
     private usersService:UserService,
     private formBuilder: FormBuilder,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private ref: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -108,7 +108,8 @@ export class ProjectViewComponent implements OnInit {
     this.isSubmit = false;
     this.refreshForm();
     this.closeModal("Add");
-    this.toastr.success("Meeting Item added sucessfully...!", "Success");
+    this.ref.detectChanges();
+    this.alertWithSuccess("Meeting Item added sucessfully...!");
   }
 
    //edit New Meeting
@@ -135,7 +136,8 @@ export class ProjectViewComponent implements OnInit {
     this.isSubmit = false;
     this.meetingItems$ = this.meetingItemService.getMeetingItems(this.meetingId);
     this.closeModal("Edit");
-    this.toastr.success("Meeting Item added edited...!", "Success");
+   
+    this.alertWithSuccess("Meeting Item edited sucessfully...!");
   }
 
   //Mark Complete
@@ -151,8 +153,8 @@ export class ProjectViewComponent implements OnInit {
     this.isSubmit = false;
     this.meetingItems$ = this.meetingItemService.getMeetingItems(this.meetingId);
     this.closeModal("Edit");
-    this.toastr.success("Meeting Item marked Completed...!", "Success");
-
+    window.location.reload();
+    this.alertWithSuccess("Meeting Item marked Completed...!");
   }
 
   openEditModal(meetingItem:MeetingItem){
@@ -192,6 +194,14 @@ export class ProjectViewComponent implements OnInit {
     this.addMeetingItemForm.controls.action.setValue('');
     this.addMeetingItemForm.controls.personResponsible.setValue('');
     this.addMeetingItemForm.controls.dueDate.setValue('');
+  }
+
+  alertWithSuccess(message:string){
+    Swal.fire(message, 'success')
+  }
+
+  alertWithError(message:string){
+    Swal.fire(message, 'error')
   }
 
   

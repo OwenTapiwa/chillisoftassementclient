@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, NgForm } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
 import { Observable, Subject } from "rxjs";
@@ -8,6 +8,8 @@ import { MeetingService } from "src/app/_services/meeting.service";
 import { UserService } from "src/app/_services/user.service";
 import { SysUsers } from "src/app/_models/sysUsers";
 import { Meeting, MeetingType } from "src/app/_models/meeting";
+import Swal from 'sweetalert2/dist/sweetalert2.js';
+
 
 declare const $: any;
 @Component({
@@ -16,52 +18,30 @@ declare const $: any;
   styleUrls: ["./project-content.component.css"],
 })
 export class ProjectContentComponent implements OnInit, OnDestroy {
-  @ViewChild(DataTableDirective, { static: false })
-  public dtElement: DataTableDirective;
-  public dtOptions: DataTables.Settings = {
-      pagingType: 'full_numbers',
-      pageLength: 10,
-      scrollX: true,
-      processing: true,
-      deferRender: true,
-      destroy:true
-  };
-  public meetings = [];
   meetingTypes: MeetingType[] | undefined;
   users:SysUsers[] | undefined;
   isSubmit: boolean = false;
   meetings$: Observable<Meeting[]> | undefined;
+  meetings: Meeting[] | undefined;
   minDate: Date;
   maxDate: Date;
-  
-
 
   addMeetingForm: FormGroup;
   private editMeetingForm: FormGroup;
- 
-
-  public rows = [];
-  public srch = [];
-  public dtTrigger: Subject<any> = new Subject();
-  public statusValue;
   public pipe = new DatePipe("en-US");
+  
   constructor(
     private meetingService: MeetingService,
     private toastr: ToastrService,
     private formBuilder: FormBuilder,
-    private usersService: UserService
+    private usersService: UserService,
+    private ref: ChangeDetectorRef
+
   ) {}
 
   ngOnInit() {
     // for data table configuration
-    this.dtOptions = {
-      // ... skipped ...
-      pageLength: 10,
-      dom: "lrtip",
-    };
-    $(document).ready(function () {
-      $('[data-bs-toggle="tooltip"]').tooltip();
-    });
+   
     this.meetings$ = this.meetingService.getMeetings();
     this.getMeetingTypes();
     this.getUsers();
@@ -92,8 +72,6 @@ export class ProjectContentComponent implements OnInit, OnDestroy {
   getMeetings() {
     this.meetingService.getMeetings().subscribe(meeting =>{
       this.meetings = meeting;
-      this.dtTrigger.next();
-      this.rows = meeting;
     })
     
   }
@@ -130,19 +108,14 @@ export class ProjectContentComponent implements OnInit, OnDestroy {
       return;
     }
     this.meetingService.addMeeting(newMeeting).subscribe();
-   
-    this.dtTrigger.next();
-    this.ngOnInit();
+    $("#create_project").modal("hide");
+    this.ref.detectChanges();
     this.addMeetingForm.reset();
     this.addMeetingForm.value.meetingtype = '';
     this.isSubmit = false;
-    //  $("#datatable").DataTable().clear();
-     console.log(this.dtElement);
-     this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
-       dtInstance.destroy();
-     });
-    $("#create_project").modal("hide");
-    this.toastr.success("Meeting added sucessfully...!", "Success");
+    window.location.reload();
+    this.alertWithSuccess("Meeting added sucessfully...!");
+    
   }
 
   
@@ -166,11 +139,18 @@ export class ProjectContentComponent implements OnInit, OnDestroy {
   //   });
   // }
 
+ 
+  alertWithSuccess(message:string){
+    Swal.fire(message, 'success')
+  }
+
+  alertWithError(message:string){
+    Swal.fire(message, 'error')
+  }
 
   // for unsubscribe datatable
   ngOnDestroy(): void {
     // Do not forget to unsubscribe the event
-    this.dtTrigger.unsubscribe();
   }
 
   
